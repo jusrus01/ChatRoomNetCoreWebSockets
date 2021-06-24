@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using Server.Models;
 
 namespace Server.Middlewares
 {
@@ -25,8 +26,19 @@ namespace Server.Middlewares
             {
                 WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
                 Console.WriteLine($"WebSocketServerMiddleware->InvokeAsync: Received a connection from {context.Connection.RemoteIpAddress}");
+                Console.WriteLine($"WebSocketServerMiddleware->InvokeAsync: Waiting for username...");
+                
+                // wait for client to send username
+                string username = await ReceiveUsername(webSocket);
 
-                string id =  _manager.AddSocket(webSocket);
+                if(username == null)
+                {
+                    Console.WriteLine($"WebSocketServerMiddleware->InvokeAsync: Username was not set, closing!");
+                    return;
+                }
+                Console.WriteLine($"WebSocketServerMiddleware->InvokeAsync: Trying to add user to session");
+                string id =  _manager.AddSocket(username, webSocket);
+                Console.WriteLine($"WebSocketServerMiddleware->InvokeAsync: User was added!");
 
                 await SendConnectionId(webSocket, id);
                 await Receive(webSocket, async (result, buffer) =>
@@ -38,10 +50,10 @@ namespace Server.Middlewares
                     }
                     else if(result.MessageType == WebSocketMessageType.Close)
                     {
-                        string id = _manager.Sockets.FirstOrDefault(soc => soc.Value == webSocket).Key;
+                        User user = _manager.Sockets.FirstOrDefault(soc => soc.Value == webSocket).Key;
 
                         WebSocket socket;
-                        _manager.Sockets.TryRemove(id, out socket);
+                        _manager.Sockets.TryRemove(user, out socket);
 
                         await socket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
                     }
@@ -55,6 +67,15 @@ namespace Server.Middlewares
                 await _next(context);
             }
         }
+
+        private async Task<string> ReceiveUsername(WebSocket socket)
+        {
+            byte[] buffer = new byte[1024];
+
+            await socket.ReceiveAsync(buffer, CancellationToken.None);
+
+            return Encoding.UTF8.GetString(buffer);
+        }
         
         private async Task RouteJSONMessageAsync(string msg) // might need to add JSON validation
         {
@@ -64,7 +85,7 @@ namespace Server.Middlewares
             if(Guid.TryParse(routeOb.To.ToString(), out guidOutput))
             {
                 string toGuid = routeOb.To;
-                var recipientSocket = _manager.Sockets.FirstOrDefault(soc => soc.Key == toGuid);
+                var recipientSocket = _manager.Sockets.FirstOrDefault(soc => soc.Key.Id == toGuid);
 
                 if(recipientSocket.Value != null)
                 {
@@ -78,7 +99,7 @@ namespace Server.Middlewares
             }
             else
             {
-                string json = JsonConvert.SerializeObject(new { Message = routeOb.Message.ToString() }, Formatting.Indented);
+                string json = JsonConvert.SerializeObject(new { Message = routeOb.Message.ToString(), Username = routeOb.Username.ToString() }, Formatting.Indented);
                 byte[] jsonData = Encoding.UTF8.GetBytes(json);
 
                 foreach(var soc in _manager.Sockets)
