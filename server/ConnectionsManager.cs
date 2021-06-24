@@ -1,23 +1,24 @@
 using System;
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
+using Server.Models;
 
 namespace Server
 {
     public class ConnectionsManager
     {
-        public ConcurrentDictionary<string, WebSocket> Sockets { private set; get; }
+        public ConcurrentDictionary<User, WebSocket> Sockets { private set; get; }
         
         public ConnectionsManager()
         {
-            Sockets = new ConcurrentDictionary<string, WebSocket>();
+            Sockets = new ConcurrentDictionary<User, WebSocket>();
         }
 
-        public string AddSocket(WebSocket socket)
+        public string AddSocket(string username, WebSocket socket)
         {
             string id = Guid.NewGuid().ToString();
 
-            if(Sockets.TryAdd(id, socket))
+            if(Sockets.TryAdd(new User { Username = username, Id = id} , socket))
             {
                 Console.WriteLine($"ConnectionsManager->AddSocket: WebSocket added with id {id}");
                 return id;
