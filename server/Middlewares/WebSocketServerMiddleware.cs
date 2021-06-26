@@ -36,11 +36,15 @@ namespace Server.Middlewares
                     Console.WriteLine($"WebSocketServerMiddleware->InvokeAsync: Username was not set, closing!");
                     return;
                 }
+
                 Console.WriteLine($"WebSocketServerMiddleware->InvokeAsync: Trying to add user to session");
                 string id =  _manager.AddSocket(username, webSocket);
                 Console.WriteLine($"WebSocketServerMiddleware->InvokeAsync: User was added!");
 
                 await SendConnectionId(webSocket, id);
+                await webSocket.CloseAsync(WebSocketCloseStatus.MessageTooBig, null, CancellationToken.None);
+                
+
                 await Receive(webSocket, async (result, buffer) =>
                 {
                     if(result.MessageType == WebSocketMessageType.Text)
@@ -68,13 +72,26 @@ namespace Server.Middlewares
             }
         }
 
+        // need to handle if such username already exists
         private async Task<string> ReceiveUsername(WebSocket socket)
         {
-            byte[] buffer = new byte[1024];
-
+            byte[] buffer = new byte[24];
             await socket.ReceiveAsync(buffer, CancellationToken.None);
 
-            return Encoding.UTF8.GetString(buffer);
+            string json = Encoding.UTF8.GetString(buffer);
+            string username;
+
+            try
+            {
+                var jsonObject = JsonConvert.DeserializeObject<dynamic>(json);
+                username = jsonObject.Username;
+            }
+            catch(JsonReaderException)
+            {
+                return null;
+            }
+
+            return username;
         }
         
         private async Task RouteJSONMessageAsync(string msg) // might need to add JSON validation
@@ -118,7 +135,7 @@ namespace Server.Middlewares
         {   
             string json = JsonConvert.SerializeObject(new { ConnectionId = id }, Formatting.Indented);
             byte[] bytes = Encoding.UTF8.GetBytes(json);
-            
+
             await socket.SendAsync(bytes, WebSocketMessageType.Text, true, CancellationToken.None);
         }
 
