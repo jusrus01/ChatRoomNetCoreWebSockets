@@ -34,6 +34,7 @@ namespace Server.Middlewares
                 if(username == null)
                 {
                     Console.WriteLine($"WebSocketServerMiddleware->InvokeAsync: Username was not set, closing!");
+                    await webSocket.CloseAsync(WebSocketCloseStatus.MessageTooBig, null, CancellationToken.None);
                     return;
                 }
 
@@ -42,9 +43,6 @@ namespace Server.Middlewares
                 Console.WriteLine($"WebSocketServerMiddleware->InvokeAsync: User was added!");
 
                 await SendConnectionId(webSocket, id);
-                await webSocket.CloseAsync(WebSocketCloseStatus.MessageTooBig, null, CancellationToken.None);
-                
-
                 await Receive(webSocket, async (result, buffer) =>
                 {
                     if(result.MessageType == WebSocketMessageType.Text)
