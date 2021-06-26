@@ -115,18 +115,26 @@ namespace Server.Middlewares
             {
                 return;
             }
-            Guid guidOutput;
-
-            if(Guid.TryParse(routeOb.To.ToString(), out guidOutput))
+            
+            string recipientUsername;
+            try
             {
-                string toGuid = routeOb.To;
-                var recipientSocket = _manager.Sockets.FirstOrDefault(soc => soc.Key.Id == toGuid);
+               recipientUsername = routeOb.To.ToString();
+            }
+            catch
+            {
+                recipientUsername = null;
+            }
+
+            if(recipientUsername != null)
+            {
+                var recipientSocket = _manager.Sockets.FirstOrDefault(soc => soc.Key.Username == recipientUsername);
 
                 if(recipientSocket.Value != null)
                 {
                     if(recipientSocket.Value.State == WebSocketState.Open)
                     {
-                        string json = JsonConvert.SerializeObject(new { Message = routeOb.Message.ToString() }, Formatting.Indented);
+                        string json = JsonConvert.SerializeObject(new { Username = routeOb.Username.ToString(), Message = routeOb.Message.ToString(), Personal = true }, Formatting.Indented);
                         await recipientSocket.Value.SendAsync(Encoding.UTF8.GetBytes(json), WebSocketMessageType.Text,
                             true, CancellationToken.None);
                     }
