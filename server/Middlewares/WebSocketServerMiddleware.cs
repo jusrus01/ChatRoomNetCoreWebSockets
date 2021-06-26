@@ -75,10 +75,11 @@ namespace Server.Middlewares
         // need to handle if such username already exists
         private async Task<string> ReceiveUsername(WebSocket socket)
         {
-            byte[] buffer = new byte[24];
+            byte[] buffer = new byte[35];
             await socket.ReceiveAsync(buffer, CancellationToken.None);
 
             string json = Encoding.UTF8.GetString(buffer);
+            Console.WriteLine(json);
             string username;
 
             try
