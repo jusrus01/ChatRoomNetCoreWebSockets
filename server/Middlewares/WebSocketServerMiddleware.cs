@@ -39,7 +39,18 @@ namespace Server.Middlewares
                 }
 
                 Console.WriteLine($"WebSocketServerMiddleware->InvokeAsync: Trying to add user to session");
-                string id =  _manager.AddSocket(username, webSocket);
+
+                string id;
+                try
+                {
+                    id =  _manager.AddSocket(username, webSocket);
+                }
+                catch
+                {
+                    await webSocket.CloseAsync(WebSocketCloseStatus.MessageTooBig, null, CancellationToken.None);
+                    return;
+                }
+
                 Console.WriteLine($"WebSocketServerMiddleware->InvokeAsync: User was added!");
 
                 await SendConnectionId(webSocket, id);
