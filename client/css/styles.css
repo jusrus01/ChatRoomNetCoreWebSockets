@@ -1,39 +1,85 @@
 body {
-    background-color: #606060;
+  background-color: #606060;
+  margin-bottom: 60px;
 }
 
-.inputFields {
-    margin-top: 2%;
+textarea {
+  resize: none;
 }
 
 html {
-    position: relative;
-    min-height: 100%;
-  }
-  body {
-    margin-bottom: 60px; /* Margin bottom by footer height */
-  }
-  .footer {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 60px; /* Set the fixed height of the footer here */
-    line-height: 60px; /* Vertically center the text there */
-    background-color:  	#404040;
-  }
+  position: relative;
+  min-height: 100%;
+}
   
-  
-  /* Custom page CSS
-  -------------------------------------------------- */
-  /* Not required for template or sticky footer method. */
-  
-  .container {
-    width: auto;
-    max-width: 680px;
-    padding: 0 15px;
-  }
+.btn {
+  height:100%;
+}
 
-  .status-text {
-    color: lightgray;
-    padding-left: 2%;
-  }
+.bottom-container {
+  position: absolute;
+  bottom: 6.6%;
+  width: 100%;
+  height: 60px;
+}
+
+.container {
+  width: auto;
+  max-width: 680px;
+  padding: 0 15px;
+}
+
+.chat-window-input {
+  text-align: center;
+  background-color: darkgreen;
+}
+
+.center {
+  /* this will keep the content center */
+  position: absolute;
+  right: 0;
+  left: 0;
+  margin: auto;
+}
+
+.card {
+  padding: 10px 0 10px 0;
+}
+
+.disable {
+  visibility: collapse;
+  position: absolute;
+}
+
+.footer {
+  position: relative;
+  margin-top: 3%;
+  width: 100%;
+  height: 60px; /* Set the fixed height of the footer here */
+  line-height: 60px; /* Vertically center the text there */
+  background-color:  	#404040;
+}
+  
+.inputFields {
+  margin-top: 2%;
+}
+
+.status-text {
+  color: lightgray;
+  padding-left: 2%;
+}
+
+.msg-group {
+  padding-left: 10%;
+  padding-right: 10%;
+  position: absolute;
+  height: 85%;
+  overflow-y: scroll;  /*if the content beyond width and height, use the scrollbar*/
+}
+
+.input-group {
+  position: relative;
+  padding-left: 10%;
+  padding-right: 10%;
+  height: 8%;
+}
