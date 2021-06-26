@@ -48,7 +48,7 @@ function initConnectButton() {
         socket.onmessage = function(event) {
     
             const receivedData = JSON.parse(event.data);
-            
+            // console.log("Received: ", event.data);
             if(receivedData["ConnectionId"]) {
 
                 connectionId = receivedData["ConnectionId"];
@@ -67,14 +67,19 @@ function initConnectButton() {
                 if(username == receivedData['Username']) {
 
                     user.setAttribute('class', 'card-subtitle mb-2 text-muted text-left')
-                    userMessage.setAttribute('class', 'card-text float-left');
+                    userMessage.setAttribute('class', 'card-text float-left text-justify');
                 } else {
+                    if(receivedData['Personal']) {
+                        user.setAttribute('class', 'card-subtitle mb-2 text-right font-weight-bold');
+                        user.innerText = receivedData['Username'] + ' (private)';
 
-                    user.setAttribute('class', 'card-subtitle mb-2 text-muted text-right')
-                    userMessage.setAttribute('class', 'card-text float-right');
+                    } else {
+                        user.setAttribute('class', 'card-subtitle mb-2 text-muted text-right');
+                        user.innerText = receivedData['Username'];
+                    }
+                    userMessage.setAttribute('class', 'card-text float-right text-justify');
                 }
     
-                user.innerText = receivedData['Username'];
                 userMessage.innerText = receivedData['Message'];
     
                 cardBody.appendChild(user);
@@ -84,8 +89,9 @@ function initConnectButton() {
                 
                 var chatField = document.getElementById('chatField');
                 chatField.appendChild(card);
+
                 // scroll to new message
-                chatField.scrollTop = chatField.clientHeight;
+                chatField.scrollTop = chatField.scrollTopMax;
             }
         };
     
@@ -190,19 +196,41 @@ function sendMessage(event) {
         alert("Error: You're not connected.");
     }
 
-    var data = constructJSONPayload();
+    var recipient;
+    var message = document.getElementById('messageInputField').value;
+    // check if message has @
+    if(message[0] == '@') {
+        var split = message.split(' ');
+
+        recipient = split[0].substring(1, split[0].length);
+        message = message.substring(recipient.length + 1);
+    }
+
+    var data = constructJSONPayload(recipient, message);
     socket.send(data);
+    
+    if(recipient) {
+        // render privately sent message
+    }
 
     // clear message input field
     document.getElementById('messageInputField').value = '';
 }
 
-function constructJSONPayload() {
+function constructJSONPayload(recipient, message) {
     
+    var temp = JSON.stringify({
+        "From" : connectionId,
+        "To" : recipient,
+        "Message" : message,
+        "Username" : username
+    });
+    console.log(temp);
+
     return JSON.stringify({
         "From" : connectionId,
-        "To" : "",
-        "Message" : document.getElementById('messageInputField').value,
+        "To" : recipient,
+        "Message" : message,
         "Username" : username
     });
 }
