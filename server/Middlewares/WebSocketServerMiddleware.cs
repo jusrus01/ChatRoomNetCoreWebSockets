@@ -95,7 +95,15 @@ namespace Server.Middlewares
         
         private async Task RouteJSONMessageAsync(string msg) // might need to add JSON validation
         {
-            var routeOb = JsonConvert.DeserializeObject<dynamic>(msg);
+            dynamic routeOb;
+            try
+            {
+                routeOb = JsonConvert.DeserializeObject<dynamic>(msg);
+            }
+            catch
+            {
+                return;
+            }
             Guid guidOutput;
 
             if(Guid.TryParse(routeOb.To.ToString(), out guidOutput))
