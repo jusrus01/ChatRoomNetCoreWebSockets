@@ -1,6 +1,5 @@
 body {
   background-color: #606060;
-  margin-bottom: 60px;
 }
 
 textarea {
@@ -18,9 +17,10 @@ html {
 
 .bottom-container {
   position: absolute;
-  bottom: 6.6%;
+  bottom: 0;
+  padding-top: 0.5%;
   width: 100%;
-  height: 60px;
+ 
 }
 
 .container {
@@ -35,7 +35,6 @@ html {
 }
 
 .center {
-  /* this will keep the content center */
   position: absolute;
   right: 0;
   left: 0;
@@ -53,10 +52,10 @@ html {
 
 .footer {
   position: relative;
-  margin-top: 3%;
+  margin-top: 1%;
   width: 100%;
-  height: 60px; /* Set the fixed height of the footer here */
-  line-height: 60px; /* Vertically center the text there */
+  height: 60px;
+  line-height: 60px;
   background-color:  	#404040;
 }
   
@@ -74,7 +73,7 @@ html {
   padding-right: 10%;
   position: absolute;
   height: 85%;
-  overflow-y: scroll;  /*if the content beyond width and height, use the scrollbar*/
+  overflow-y: scroll;
 }
 
 .input-group {

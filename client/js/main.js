@@ -1,8 +1,8 @@
 const userInputDivHtmlCopy = document.getElementById("usernameInput").innerHTML;
 const connectionUrl = "ws://localhost:5000";
-var removeLastMessage = false;
 const maxMessageCount = 50;
 
+var removeLastMessage = false;
 var socket;
 var connectionId;
 var username;
@@ -75,7 +75,6 @@ function initConnectButton() {
         };
     }
 }
-
 
 
 function updateState() {
@@ -272,7 +271,6 @@ function renderMessage(recipient, message, privateMessage, renderToSelf) {
             removeFirstMessage();
         }
     } else {
-        // remove message
         removeFirstMessage();
     }
 
@@ -287,19 +285,19 @@ function renderMessage(recipient, message, privateMessage, renderToSelf) {
 
     if(renderToSelf && privateMessage) {
         user.setAttribute('class', 'card-subtitle mb-2 font-weight-bold text-left');
-        userMessage.setAttribute('class', 'card-text float-left text-justify');
+        userMessage.setAttribute('class', 'card-text float-left text-justify text-break');
         user.innerText ='From Me To ' + recipient + ' (private)';
     } else if(renderToSelf) {
         user.setAttribute('class', 'card-subtitle mb-2 text-muted text-left');
-        userMessage.setAttribute('class', 'card-text float-left text-justify');
+        userMessage.setAttribute('class', 'card-text float-left text-justify text-break');
         user.innerText = username;
     } else if(privateMessage) {
         user.setAttribute('class', 'card-subtitle mb-2 font-weight-bold text-right');
-        userMessage.setAttribute('class', 'card-text float-right text-justify');
+        userMessage.setAttribute('class', 'card-text float-right text-justify text-break');
         user.innerText = 'From ' + recipient + ' To Me (private)';
     } else {
         user.setAttribute('class', 'card-subtitle mb-2 text-muted text-right');
-        userMessage.setAttribute('class', 'card-text float-right text-justify');
+        userMessage.setAttribute('class', 'card-text float-right text-justify text-break');
         user.innerText = recipient;
     }
 

@@ -16,8 +16,8 @@
             <h2 class="text-center inputFields text-white">Welcome to a public chat room!</h2>
             <div class="row justify-content-center inputFields text-white" id="inputFields">
                 <div class="form-group">
-                    <label for="userName">Username: </label>
-                    <input type="text" id="userName" autofocus>
+                    <label for="userName">Enter your username: </label>
+                    <input type="text" id="userName" maxlength="20" autofocus>
                     <button type="submit" class="btn btn-primary" id="connectBtn">Join!</button>
                 </div>
             </div>
@@ -32,7 +32,7 @@
 
     <div class="bottom-container">
         <div class="input-group disable" id="chatInput">
-            <input id="messageInputField" class="form-control" rows="1" placeholder="Say something..."></input>
+            <input id="messageInputField" class="form-control" rows="1" placeholder="Say something..." maxlength="900"></input>
             <span class="input-group-btn">
                 <button class="btn btn-secondary" type="button" id="sendButton">Send</button>
             </span>

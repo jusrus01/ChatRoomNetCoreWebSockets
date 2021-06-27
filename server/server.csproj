@@ -4,7 +4,7 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
   <PropertyGroup>
-    <OutputPath>E:\VisualStudioBuildss\$(AssemblyName)\bin\$(Configuration)\</OutputPath>
+    <OutputPath>E:\VisualStudioBuildsss\$(AssemblyName)\bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
