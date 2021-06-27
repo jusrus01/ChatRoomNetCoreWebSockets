@@ -197,14 +197,6 @@ function sendMessage(event) {
 }
 
 function constructJSONPayload(recipient, message) {
-    
-    var temp = JSON.stringify({
-        "From" : connectionId,
-        "To" : recipient,
-        "Message" : message,
-        "Username" : username
-    });
-    console.log(temp);
 
     return JSON.stringify({
         "From" : connectionId,
