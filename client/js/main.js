@@ -1,9 +1,13 @@
 const userInputDivHtmlCopy = document.getElementById("usernameInput").innerHTML;
 const connectionUrl = "ws://localhost:5000";
+var removeLastMessage = false;
+const maxMessageCount = 50;
 
 var socket;
 var connectionId;
 var username;
+var messageCount;
+var nextMessage;
 
 init();
 
@@ -93,7 +97,9 @@ function updateState() {
                 connectionStatus.innerHTML = "Status: Closed";
                 document.getElementById("usernameInput").innerHTML = userInputDivHtmlCopy;
                 idText.innerHTML = 'Id: N/a';
-                //deconstructChatWindow();
+
+                socket = null;
+                initConnectButton();
                 break;
 
             case WebSocket.CLOSING:
@@ -110,7 +116,6 @@ function updateState() {
                     constructChatWindow();
                 } else {
                     idText.innerHTML = "Id: Failed to receive an Id";
-                    //deconstructChatWindow();
                 }
                 break;
 
@@ -123,6 +128,9 @@ function updateState() {
                 connectionStatus = "Status: Failed to connect. Error message: " + htmlEscape(socket.readyState);
                 idText.innerHTML = 'Id: N/a';
                 document.getElementById("usernameInput").innerHTML = userInputDivHtmlCopy;
+
+                socket = null;
+                initConnectButton();
                 break;
         }
     }
@@ -222,7 +230,51 @@ function initUsernameInputField() {
     })
 }
 
+function removeFirstMessage() {
+
+    const chatField = document.getElementById('chatField');
+    const childNodes = chatField.childNodes;
+
+    if(childNodes.length <= 1 || childNodes == null) {
+
+        console.error("removeFirstMessage(): There aren't any available messages for removal.");
+        return;
+    }
+
+    if(nextMessage == null) {
+        const node = childNodes[0];
+        nextMessage = node.nextSibling;
+        chatField.removeChild(node);
+    } else {
+
+        const temp = nextMessage;
+        if(nextMessage.nextSibling != null) {
+
+            nextMessage = nextMessage.nextSibling;
+        }
+
+        chatField.removeChild(temp);
+    }
+}
+
 function renderMessage(recipient, message, privateMessage, renderToSelf) {
+
+    if(!removeLastMessage) {
+
+        if(messageCount == null) {
+            messageCount = 0;
+        } else {
+            messageCount++;
+        }
+
+        if(messageCount >= maxMessageCount) {
+            removeLastMessage = true;
+            removeFirstMessage();
+        }
+    } else {
+        // remove message
+        removeFirstMessage();
+    }
 
     var card = document.createElement('div');
     card.setAttribute('class', 'card');
@@ -246,7 +298,7 @@ function renderMessage(recipient, message, privateMessage, renderToSelf) {
         userMessage.setAttribute('class', 'card-text float-right text-justify');
         user.innerText = 'From ' + recipient + ' To Me (private)';
     } else {
-        user.setAttribute('class', 'card-subtitle mb-2 text-right');
+        user.setAttribute('class', 'card-subtitle mb-2 text-muted text-right');
         userMessage.setAttribute('class', 'card-text float-right text-justify');
         user.innerText = recipient;
     }
