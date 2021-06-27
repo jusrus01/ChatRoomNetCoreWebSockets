@@ -13,6 +13,7 @@ namespace Server
 {
     public class Startup
     {
+        private ConnectionsManager _manager;
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddWebSocketServerConnectionManager();
@@ -20,6 +21,11 @@ namespace Server
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            var hostAppLifetime = app.ApplicationServices.GetRequiredService<IHostApplicationLifetime>();
+            hostAppLifetime.ApplicationStopping.Register(OnShutDown);
+
+            _manager = app.ApplicationServices.GetRequiredService<ConnectionsManager>();
+
             app.UseWebSockets();
             app.UseWebSocketServer();
 
@@ -27,6 +33,14 @@ namespace Server
             {
                 await context.Response.WriteAsync("Hello world");
             });
+        }
+
+        public void OnShutDown()
+        {
+            if(_manager != null)
+            {
+                _manager.CloseAllConnections();
+            }            
         }
     }
 }

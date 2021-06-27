@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using Server.Models;
+using System.Threading;
 
 namespace Server
 {
@@ -25,6 +26,15 @@ namespace Server
             }
 
             throw new Exception("ConnectionsManager->AddSocket: Failed to add a new WebSocket");
+        }
+
+        public async void CloseAllConnections()
+        {
+            foreach(var sock in Sockets)
+            {
+                await sock.Value.CloseAsync(WebSocketCloseStatus.EndpointUnavailable,
+                    null, CancellationToken.None);
+            }
         }
     }
 }

@@ -52,6 +52,7 @@ namespace Server.Middlewares
                 }
 
                 Console.WriteLine($"WebSocketServerMiddleware->InvokeAsync: User was added!");
+                Console.WriteLine($"Current active connections: {_manager.Sockets.Count}");
 
                 await SendConnectionId(webSocket, id);
                 await Receive(webSocket, async (result, buffer) =>
