@@ -46,52 +46,23 @@ function initConnectButton() {
         };
     
         socket.onmessage = function(event) {
-    
-            const receivedData = JSON.parse(event.data);
-            // console.log("Received: ", event.data);
-            if(receivedData["ConnectionId"]) {
 
+            const receivedData = JSON.parse(event.data);
+
+            if(receivedData["ConnectionId"]) {
                 connectionId = receivedData["ConnectionId"];
                 updateState();
+
             } else if(receivedData['Message']) {
-
-                var card = document.createElement('div');
-                card.setAttribute('class', 'card');
-    
-                var cardBody = document.createElement('div');
-                cardBody.setAttribute('class', 'card-body');
-    
-                var user = document.createElement('h6');
-                var userMessage = document.createElement('p');
-    
-                if(username == receivedData['Username']) {
-
-                    user.setAttribute('class', 'card-subtitle mb-2 text-muted text-left')
-                    userMessage.setAttribute('class', 'card-text float-left text-justify');
+                if(receivedData['Personal']) {
+                    renderMessage(receivedData['Username'], receivedData['Message'],
+                        true, false);
+                } else if(receivedData['Username'] == username) {
+                    renderMessage(username, receivedData['Message'], false, true);
                 } else {
-                    if(receivedData['Personal']) {
-                        user.setAttribute('class', 'card-subtitle mb-2 text-right font-weight-bold');
-                        user.innerText = receivedData['Username'] + ' (private)';
-
-                    } else {
-                        user.setAttribute('class', 'card-subtitle mb-2 text-muted text-right');
-                        user.innerText = receivedData['Username'];
-                    }
-                    userMessage.setAttribute('class', 'card-text float-right text-justify');
+                    renderMessage(receivedData['Username'], receivedData['Message'],
+                        false, false);
                 }
-    
-                userMessage.innerText = receivedData['Message'];
-    
-                cardBody.appendChild(user);
-                cardBody.appendChild(userMessage);
-    
-                card.appendChild(cardBody);
-                
-                var chatField = document.getElementById('chatField');
-                chatField.appendChild(card);
-
-                // scroll to new message
-                chatField.scrollTop = chatField.scrollTopMax;
             }
         };
     
@@ -211,6 +182,7 @@ function sendMessage(event) {
     
     if(recipient) {
         // render privately sent message
+        renderMessage(recipient, message, true, true);
     }
 
     // clear message input field
@@ -248,4 +220,46 @@ function initUsernameInputField() {
             connectBtn.click();
         }
     })
+}
+
+function renderMessage(recipient, message, privateMessage, renderToSelf) {
+
+    var card = document.createElement('div');
+    card.setAttribute('class', 'card');
+    
+    var cardBody = document.createElement('div');
+    cardBody.setAttribute('class', 'card-body');
+    
+    var user = document.createElement('h6');
+    var userMessage = document.createElement('p');
+
+    if(renderToSelf && privateMessage) {
+        user.setAttribute('class', 'card-subtitle mb-2 font-weight-bold text-left');
+        userMessage.setAttribute('class', 'card-text float-left text-justify');
+        user.innerText ='From Me To ' + recipient + ' (private)';
+    } else if(renderToSelf) {
+        user.setAttribute('class', 'card-subtitle mb-2 text-muted text-left');
+        userMessage.setAttribute('class', 'card-text float-left text-justify');
+        user.innerText = username;
+    } else if(privateMessage) {
+        user.setAttribute('class', 'card-subtitle mb-2 font-weight-bold text-right');
+        userMessage.setAttribute('class', 'card-text float-right text-justify');
+        user.innerText = 'From ' + recipient + ' To Me (private)';
+    } else {
+        user.setAttribute('class', 'card-subtitle mb-2 text-right');
+        userMessage.setAttribute('class', 'card-text float-right text-justify');
+        user.innerText = recipient;
+    }
+
+    userMessage.innerText = message;
+
+    cardBody.appendChild(user);
+    cardBody.appendChild(userMessage);
+
+    card.appendChild(cardBody);
+
+    var chat = chatField = document.getElementById('chatField');
+    chat.appendChild(card);
+    // scroll to new message
+    chatField.scrollTop = chatField.scrollTopMax;
 }
