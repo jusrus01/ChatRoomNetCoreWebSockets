@@ -105,7 +105,7 @@ namespace Server.Middlewares
             return username;
         }
         
-        private async Task RouteJSONMessageAsync(string msg) // might need to add JSON validation
+        private async Task RouteJSONMessageAsync(string msg)
         {
             dynamic routeOb;
             try
